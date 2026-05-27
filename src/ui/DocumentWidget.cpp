@@ -5,28 +5,30 @@
 #include "RoomTableModel.h"
 #include "core/room.h"
 
-#include <QBarSet>
-#include <QBarSeries>
-#include <QChart>
-#include <QChartView>
+#include <QAbstractItemModel>
+#include <QComboBox>
 #include <QDialog>
 #include <QDialogButtonBox>
 #include <QFile>
 #include <QFileInfo>
 #include <QFormLayout>
 #include <QHeaderView>
-#include <QInputDialog>
 #include <QItemSelectionModel>
 #include <QLineEdit>
+#include <QMap>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
+#include <QPlainTextEdit>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPushButton>
-#include <QRegularExpression>
+#include <QTableView>
 #include <QTextStream>
 #include <QVBoxLayout>
+
+#include <algorithm>
+#include <functional>
 
 namespace {
 constexpr int AllColumnsValue = -1;
@@ -115,7 +117,7 @@ DocumentWidget::DocumentWidget(QWidget *parent)
     setupTable();
     setupSearchColumns();
 
-    connect(ui->searchColumnComboBox, &QComboBox::currentIndexChanged, this, &DocumentWidget::updateSearchColumn);
+    connect(ui->searchColumnComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DocumentWidget::updateSearchColumn);
     connect(ui->searchLineEdit, &QLineEdit::textChanged, this, &DocumentWidget::updateSearchText);
     connect(ui->clearSearchButton, &QPushButton::clicked, this, &DocumentWidget::clearSearch);
 
@@ -313,32 +315,35 @@ void DocumentWidget::showChart()
 {
     QMap<QString, double> areaByType;
     for (const Room &room : m_model->rooms()) {
-        areaByType[room.type] += room.area;
+        const QString type = room.type.trimmed().isEmpty() ? tr("Unknown") : room.type.trimmed();
+        areaByType[type] += room.area;
     }
 
-    auto *set = new QBarSet(tr("Area"));
-    QStringList categories;
+    QString chartText;
+    double maxArea = 0.0;
     for (auto iterator = areaByType.cbegin(); iterator != areaByType.cend(); ++iterator) {
-        categories.append(iterator.key().isEmpty() ? tr("Unknown") : iterator.key());
-        *set << iterator.value();
+        maxArea = std::max(maxArea, iterator.value());
     }
 
-    auto *series = new QBarSeries;
-    series->append(set);
+    for (auto iterator = areaByType.cbegin(); iterator != areaByType.cend(); ++iterator) {
+        const int barLength = maxArea > 0.0 ? static_cast<int>((iterator.value() / maxArea) * 40.0) : 0;
+        chartText += QStringLiteral("%1 | %2 %3\n")
+                         .arg(iterator.key(), -20)
+                         .arg(QString(barLength, QChar(0x2588)))
+                         .arg(iterator.value(), 0, 'f', 2);
+    }
 
-    auto *chart = new QChart;
-    chart->addSeries(series);
-    chart->setTitle(tr("Area by room type"));
-    chart->createDefaultAxes();
-
-    auto *chartView = new QChartView(chart);
-    chartView->setRenderHint(QPainter::Antialiasing);
+    if (chartText.isEmpty()) {
+        chartText = tr("No data for chart.");
+    }
 
     QDialog dialog(this);
     dialog.setWindowTitle(tr("Chart"));
     auto *layout = new QVBoxLayout(&dialog);
-    layout->addWidget(chartView);
-    dialog.resize(800, 500);
+    auto *textEdit = new QPlainTextEdit(chartText);
+    textEdit->setReadOnly(true);
+    layout->addWidget(textEdit);
+    dialog.resize(700, 400);
     dialog.exec();
 }
 
