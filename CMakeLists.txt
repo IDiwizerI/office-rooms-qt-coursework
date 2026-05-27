@@ -17,6 +17,11 @@ qt_add_executable(office_rooms_qt_coursework
     src/main.cpp
     resources/resources.qrc
 
+    src/model/RoomTableModel.h
+    src/model/RoomTableModel.cpp
+    src/model/RoomSortFilterProxyModel.h
+    src/model/RoomSortFilterProxyModel.cpp
+
     include/core/room.h
     include/documents/roomdocument.h
     include/models/roomtablemodel.h
@@ -34,6 +39,7 @@ qt_add_executable(office_rooms_qt_coursework
 target_include_directories(office_rooms_qt_coursework
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/model
 )
 
 target_link_libraries(office_rooms_qt_coursework
