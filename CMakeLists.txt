@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport Charts)
+find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport)
 
 qt_standard_project_setup()
 
@@ -54,5 +54,4 @@ target_link_libraries(office_rooms_qt_coursework
     PRIVATE
         Qt6::Widgets
         Qt6::PrintSupport
-        Qt6::Charts
 )
