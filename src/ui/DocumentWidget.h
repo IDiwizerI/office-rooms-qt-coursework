@@ -1,10 +1,14 @@
 #pragma once
 
+#include <QModelIndex>
+#include <QPoint>
+#include <QString>
 #include <QWidget>
 
 class RoomTableModel;
 class RoomSortFilterProxyModel;
 class QTableView;
+struct Room;
 
 namespace Ui {
 class DocumentWidget;
@@ -97,7 +101,7 @@ public slots:
     void deleteSelectedRooms();
 
     /**
-     * @brief Opens print preview for the document table.
+     * @brief Opens print dialog for the document table.
      */
     void printDocument();
 
