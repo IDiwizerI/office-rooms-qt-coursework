@@ -8,7 +8,6 @@
 class RoomTableModel;
 class RoomSortFilterProxyModel;
 class QTableView;
-struct Room;
 
 namespace Ui {
 class DocumentWidget;
@@ -85,124 +84,67 @@ public:
     bool saveAs(const QString &filePath, QString *errorMessage = nullptr);
 
 public slots:
-    /**
-     * @brief Adds a new room record.
-     */
+    /** @brief Adds a new room record. */
     void addRoom();
 
-    /**
-     * @brief Edits the selected room record.
-     */
+    /** @brief Edits the selected room record. */
     void editSelectedRoom();
 
-    /**
-     * @brief Deletes selected room records.
-     */
+    /** @brief Deletes selected room records. */
     void deleteSelectedRooms();
 
-    /**
-     * @brief Opens print dialog for the document table.
-     */
+    /** @brief Opens print dialog for the document table. */
     void printDocument();
 
-    /**
-     * @brief Shows a simple chart based on room areas by type.
-     */
+    /** @brief Shows chart dialog for this document. */
     void showChart();
 
-    /**
-     * @brief Sets focus to the search input field.
-     */
+    /** @brief Sets focus to the search input field. */
     void focusSearch();
 
-    /**
-     * @brief Clears current search filter.
-     */
+    /** @brief Clears current search filter. */
     void clearSearch();
 
 signals:
-    /**
-     * @brief Emitted when the file path changes.
-     * @param filePath New file path.
-     */
+    /** @brief Emitted when the file path changes. */
     void filePathChanged(const QString &filePath);
 
-    /**
-     * @brief Emitted when the modified state changes.
-     * @param modified New modified state.
-     */
+    /** @brief Emitted when the modified state changes. */
     void modifiedChanged(bool modified);
 
-    /**
-     * @brief Emitted when tab title must be updated.
-     */
+    /** @brief Emitted when tab title must be updated. */
     void titleChanged();
 
 private slots:
-    /**
-     * @brief Updates proxy search column from the combo box.
-     * @param index Combo box index.
-     */
+    /** @brief Updates proxy search column from the combo box. */
     void updateSearchColumn(int index);
 
-    /**
-     * @brief Updates proxy search text from the line edit.
-     * @param text Search text.
-     */
+    /** @brief Updates proxy search text from the line edit. */
     void updateSearchText(const QString &text);
 
-    /**
-     * @brief Shows the context menu for the table view.
-     * @param position Context menu position in table coordinates.
-     */
+    /** @brief Shows the context menu for the table view. */
     void showContextMenu(const QPoint &position);
 
-    /**
-     * @brief Edits a row after double click.
-     * @param index Clicked proxy index.
-     */
+    /** @brief Edits a row after double click. */
     void handleDoubleClick(const QModelIndex &index);
 
-    /**
-     * @brief Marks the document as modified after model changes.
-     */
+    /** @brief Marks the document as modified after model changes. */
     void markModified();
 
 private:
-    /**
-     * @brief Configures table view and model connections.
-     */
+    /** @brief Configures table view and model connections. */
     void setupTable();
 
-    /**
-     * @brief Fills the search column combo box.
-     */
+    /** @brief Fills the search column combo box. */
     void setupSearchColumns();
 
-    /**
-     * @brief Updates file path and emits related signals.
-     * @param filePath New file path.
-     */
+    /** @brief Updates file path and emits related signals. */
     void setFilePath(const QString &filePath);
 
-    /**
-     * @brief Updates modified state and emits related signals.
-     * @param modified New modified state.
-     */
+    /** @brief Updates modified state and emits related signals. */
     void setModified(bool modified);
 
-    /**
-     * @brief Opens an inline room editing dialog.
-     * @param room Room object to edit.
-     * @param title Dialog title.
-     * @return True if user accepted the dialog.
-     */
-    bool editRoomWithDialog(Room *room, const QString &title);
-
-    /**
-     * @brief Returns the selected source model row.
-     * @return Source row or -1 if no valid row is selected.
-     */
+    /** @brief Returns the selected source model row. */
     int currentSourceRow() const;
 
     Ui::DocumentWidget *ui;
