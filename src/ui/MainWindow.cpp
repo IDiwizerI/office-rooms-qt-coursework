@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "AboutDialog.h"
 #include "DocumentWidget.h"
 
 #include <QFileDialog>
@@ -158,11 +159,8 @@ void MainWindow::clearSearch()
 
 void MainWindow::showAboutDialog()
 {
-    QMessageBox::about(
-        this,
-        tr("About"),
-        tr("Office Rooms\n\nCoursework: Office premises accounting software for a construction company.\n\nAuthor: Shavaliev Amir Ilmirovich\nInstitute: ICTMS\nCourse and group: II-101")
-    );
+    AboutDialog dialog(this);
+    dialog.exec();
 }
 
 void MainWindow::updateActions()
