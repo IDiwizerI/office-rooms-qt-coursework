@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport Charts)
 
 qt_standard_project_setup()
 
@@ -21,6 +21,13 @@ qt_add_executable(office_rooms_qt_coursework
     src/model/RoomTableModel.cpp
     src/model/RoomSortFilterProxyModel.h
     src/model/RoomSortFilterProxyModel.cpp
+
+    src/ui/MainWindow.h
+    src/ui/MainWindow.cpp
+    src/ui/MainWindow.ui
+    src/ui/DocumentWidget.h
+    src/ui/DocumentWidget.cpp
+    src/ui/DocumentWidget.ui
 
     include/core/room.h
     include/documents/roomdocument.h
@@ -40,9 +47,12 @@ target_include_directories(office_rooms_qt_coursework
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
 )
 
 target_link_libraries(office_rooms_qt_coursework
     PRIVATE
         Qt6::Widgets
+        Qt6::PrintSupport
+        Qt6::Charts
 )
