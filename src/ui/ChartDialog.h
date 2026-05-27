@@ -3,6 +3,7 @@
 #include "core/room.h"
 
 #include <QDialog>
+#include <QPainter>
 #include <QVector>
 
 class QChartView;
