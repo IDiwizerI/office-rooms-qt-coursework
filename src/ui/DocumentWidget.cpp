@@ -1,31 +1,26 @@
 #include "DocumentWidget.h"
 #include "ui_DocumentWidget.h"
 
+#include "ChartDialog.h"
+#include "RoomEditDialog.h"
 #include "RoomSortFilterProxyModel.h"
 #include "RoomTableModel.h"
 #include "core/room.h"
 
 #include <QAbstractItemModel>
 #include <QComboBox>
-#include <QDialog>
-#include <QDialogButtonBox>
 #include <QFile>
 #include <QFileInfo>
-#include <QFormLayout>
 #include <QHeaderView>
 #include <QItemSelectionModel>
-#include <QLineEdit>
-#include <QMap>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPainter>
-#include <QPlainTextEdit>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPushButton>
 #include <QTableView>
 #include <QTextStream>
-#include <QVBoxLayout>
 
 #include <algorithm>
 #include <functional>
@@ -97,13 +92,6 @@ QString roomToLine(const Room &room)
         escapeField(room.status),
         escapeField(room.responsible)
     }.join(';');
-}
-
-void addLineEdit(QFormLayout *layout, QList<QLineEdit *> *fields, const QString &label, const QString &value)
-{
-    auto *lineEdit = new QLineEdit(value);
-    layout->addRow(label, lineEdit);
-    fields->append(lineEdit);
 }
 } // namespace
 
@@ -250,12 +238,14 @@ bool DocumentWidget::saveAs(const QString &filePath, QString *errorMessage)
 
 void DocumentWidget::addRoom()
 {
-    Room room;
-    if (!editRoomWithDialog(&room, tr("Add room"))) {
+    RoomEditDialog dialog(this);
+    dialog.setWindowTitle(tr("Add room"));
+
+    if (dialog.exec() != QDialog::Accepted) {
         return;
     }
 
-    m_model->addRoom(room);
+    m_model->addRoom(dialog.room());
 }
 
 void DocumentWidget::editSelectedRoom()
@@ -266,12 +256,15 @@ void DocumentWidget::editSelectedRoom()
         return;
     }
 
-    Room room = m_model->roomAt(sourceRow);
-    if (!editRoomWithDialog(&room, tr("Edit room"))) {
+    RoomEditDialog dialog(this);
+    dialog.setWindowTitle(tr("Edit room"));
+    dialog.setRoom(m_model->roomAt(sourceRow));
+
+    if (dialog.exec() != QDialog::Accepted) {
         return;
     }
 
-    m_model->updateRoom(sourceRow, room);
+    m_model->updateRoom(sourceRow, dialog.room());
 }
 
 void DocumentWidget::deleteSelectedRooms()
@@ -313,37 +306,8 @@ void DocumentWidget::printDocument()
 
 void DocumentWidget::showChart()
 {
-    QMap<QString, double> areaByType;
-    for (const Room &room : m_model->rooms()) {
-        const QString type = room.type.trimmed().isEmpty() ? tr("Unknown") : room.type.trimmed();
-        areaByType[type] += room.area;
-    }
-
-    QString chartText;
-    double maxArea = 0.0;
-    for (auto iterator = areaByType.cbegin(); iterator != areaByType.cend(); ++iterator) {
-        maxArea = std::max(maxArea, iterator.value());
-    }
-
-    for (auto iterator = areaByType.cbegin(); iterator != areaByType.cend(); ++iterator) {
-        const int barLength = maxArea > 0.0 ? static_cast<int>((iterator.value() / maxArea) * 40.0) : 0;
-        chartText += QStringLiteral("%1 | %2 %3\n")
-                         .arg(iterator.key(), -20)
-                         .arg(QString(barLength, QChar(0x2588)))
-                         .arg(iterator.value(), 0, 'f', 2);
-    }
-
-    if (chartText.isEmpty()) {
-        chartText = tr("No data for chart.");
-    }
-
-    QDialog dialog(this);
-    dialog.setWindowTitle(tr("Chart"));
-    auto *layout = new QVBoxLayout(&dialog);
-    auto *textEdit = new QPlainTextEdit(chartText);
-    textEdit->setReadOnly(true);
-    layout->addWidget(textEdit);
-    dialog.resize(700, 400);
+    ChartDialog dialog(this);
+    dialog.setRooms(m_model->rooms());
     dialog.exec();
 }
 
@@ -438,63 +402,6 @@ void DocumentWidget::setModified(bool modified)
     m_modified = modified;
     emit modifiedChanged(m_modified);
     emit titleChanged();
-}
-
-bool DocumentWidget::editRoomWithDialog(Room *room, const QString &title)
-{
-    QDialog dialog(this);
-    dialog.setWindowTitle(title);
-
-    auto *layout = new QVBoxLayout(&dialog);
-    auto *formLayout = new QFormLayout;
-    QList<QLineEdit *> fields;
-
-    addLineEdit(formLayout, &fields, tr("ID"), room->id);
-    addLineEdit(formLayout, &fields, tr("Building"), room->building);
-    addLineEdit(formLayout, &fields, tr("Floor"), QString::number(room->floor));
-    addLineEdit(formLayout, &fields, tr("Room number"), room->number);
-    addLineEdit(formLayout, &fields, tr("Type"), room->type);
-    addLineEdit(formLayout, &fields, tr("Area"), QString::number(room->area, 'f', 2));
-    addLineEdit(formLayout, &fields, tr("Department"), room->department);
-    addLineEdit(formLayout, &fields, tr("Workplaces"), QString::number(room->workplaces));
-    addLineEdit(formLayout, &fields, tr("Status"), room->status);
-    addLineEdit(formLayout, &fields, tr("Responsible"), room->responsible);
-
-    layout->addLayout(formLayout);
-
-    auto *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
-    layout->addWidget(buttons);
-    connect(buttons, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
-    connect(buttons, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
-
-    if (dialog.exec() != QDialog::Accepted) {
-        return false;
-    }
-
-    bool floorOk = false;
-    bool areaOk = false;
-    bool workplacesOk = false;
-    const int floor = fields.at(2)->text().toInt(&floorOk);
-    const double area = fields.at(5)->text().toDouble(&areaOk);
-    const int workplaces = fields.at(7)->text().toInt(&workplacesOk);
-
-    if (!floorOk || !areaOk || !workplacesOk || floor < 0 || area < 0.0 || workplaces < 0) {
-        QMessageBox::warning(this, tr("Invalid data"), tr("Floor, area and workplaces must be non-negative numbers."));
-        return false;
-    }
-
-    room->id = fields.at(0)->text().trimmed();
-    room->building = fields.at(1)->text().trimmed();
-    room->floor = floor;
-    room->number = fields.at(3)->text().trimmed();
-    room->type = fields.at(4)->text().trimmed();
-    room->area = area;
-    room->department = fields.at(6)->text().trimmed();
-    room->workplaces = workplaces;
-    room->status = fields.at(8)->text().trimmed();
-    room->responsible = fields.at(9)->text().trimmed();
-
-    return true;
 }
 
 int DocumentWidget::currentSourceRow() const
