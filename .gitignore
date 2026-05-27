@@ -1,0 +1,14 @@
+build/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+*.user
+*.autosave
+*.pro.user
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.dylib
+.DS_Store
