@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport)
+find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport Charts)
 
 qt_standard_project_setup()
 
@@ -28,6 +28,15 @@ qt_add_executable(office_rooms_qt_coursework
     src/ui/DocumentWidget.h
     src/ui/DocumentWidget.cpp
     src/ui/DocumentWidget.ui
+    src/ui/RoomEditDialog.h
+    src/ui/RoomEditDialog.cpp
+    src/ui/RoomEditDialog.ui
+    src/ui/AboutDialog.h
+    src/ui/AboutDialog.cpp
+    src/ui/AboutDialog.ui
+    src/ui/ChartDialog.h
+    src/ui/ChartDialog.cpp
+    src/ui/ChartDialog.ui
 
     include/core/room.h
     include/documents/roomdocument.h
@@ -54,4 +63,5 @@ target_link_libraries(office_rooms_qt_coursework
     PRIVATE
         Qt6::Widgets
         Qt6::PrintSupport
+        Qt6::Charts
 )
