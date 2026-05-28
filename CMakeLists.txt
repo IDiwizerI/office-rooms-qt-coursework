@@ -33,7 +33,7 @@ set(PROJECT_SOURCES
     src/ui/MainWindow.cpp
     src/ui/MainWindow.ui
     src/ui/DocumentWidget.h
-    src/ui/DocumentWidget.cpp
+    src/ui/DocumentWidgetOrdb.cpp
     src/ui/DocumentWidget.ui
     src/ui/RoomEditDialog.h
     src/ui/RoomEditDialog.cpp
