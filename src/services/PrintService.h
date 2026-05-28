@@ -1,12 +1,13 @@
 #pragma once
 
 #include <QObject>
+#include <QString>
 
 class QAbstractItemModel;
 class QWidget;
 
 /**
- * @brief Provides database table printing through QPrinter and QPrintPreviewDialog.
+ * @brief Provides table printing through QPrinter and QPrintPreviewDialog.
  */
 class PrintService final : public QObject
 {
