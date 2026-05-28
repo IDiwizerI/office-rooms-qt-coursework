@@ -76,6 +76,11 @@ qt_add_translations(office_rooms_qt_coursework
     LUPDATE_OPTIONS -no-obsolete
 )
 
+target_compile_definitions(office_rooms_qt_coursework
+    PRIVATE
+        OFFICE_ROOMS_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data"
+)
+
 target_include_directories(office_rooms_qt_coursework
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
