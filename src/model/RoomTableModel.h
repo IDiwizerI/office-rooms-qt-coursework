@@ -87,6 +87,11 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     /**
+     * @brief Emits headerDataChanged after a language switch.
+     */
+    void refreshHeaderTranslations();
+
+    /**
      * @brief Returns item flags for a model index.
      * @param index Model index.
      * @return Enabled item flags including edit, drag and drop support.
