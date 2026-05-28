@@ -8,11 +8,37 @@
 
 #include <QApplication>
 #include <QCloseEvent>
+#include <QDir>
 #include <QEvent>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QMessageBox>
 #include <QStatusBar>
 #include <QTabWidget>
+
+namespace {
+QString databaseDirectory()
+{
+#ifdef OFFICE_ROOMS_DATA_DIR
+    const QString configuredPath = QString::fromUtf8(OFFICE_ROOMS_DATA_DIR);
+    if (QDir(configuredPath).exists()) {
+        return configuredPath;
+    }
+#endif
+
+    const QString applicationDataPath = QCoreApplication::applicationDirPath() + QDir::separator() + QStringLiteral("data");
+    if (QDir(applicationDataPath).exists()) {
+        return applicationDataPath;
+    }
+
+    const QString currentDataPath = QDir::currentPath() + QDir::separator() + QStringLiteral("data");
+    if (QDir(currentDataPath).exists()) {
+        return currentDataPath;
+    }
+
+    return QDir::homePath();
+}
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -73,7 +99,7 @@ void MainWindow::openFiles()
     const QStringList filePaths = QFileDialog::getOpenFileNames(
         this,
         tr("Open room database"),
-        QString(),
+        databaseDirectory(),
         tr("Office rooms database (*.ordb);;Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
     );
 
@@ -357,7 +383,7 @@ bool MainWindow::saveDocumentAs(DocumentWidget *document)
     const QString filePath = QFileDialog::getSaveFileName(
         this,
         tr("Save room database"),
-        document->filePath(),
+        document->filePath().isEmpty() ? databaseDirectory() : document->filePath(),
         tr("Office rooms database (*.ordb);;Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
     );
 
