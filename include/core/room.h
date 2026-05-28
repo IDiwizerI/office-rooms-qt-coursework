@@ -1,20 +1,23 @@
 #pragma once
 
+#include <QDate>
 #include <QString>
 
 /**
- * @brief Describes one office room record.
+ * @brief Describes one office room record stored in the text database.
  */
 struct Room
 {
     QString id;
     QString building;
     int floor = 0;
-    QString number;
-    QString type;
+    QString roomNumber;
+    QString roomType;
     double area = 0.0;
+    int capacity = 0;
     QString department;
-    int workplaces = 0;
-    QString status;
-    QString responsible;
+    QString responsiblePerson;
+    QString condition;
+    QDate lastRenovationDate = QDate::currentDate();
+    QString notes;
 };
