@@ -3,7 +3,12 @@
 
 #include "AboutDialog.h"
 #include "DocumentWidget.h"
+#include "SettingsManager.h"
+#include "TranslationManager.h"
 
+#include <QApplication>
+#include <QCloseEvent>
+#include <QEvent>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStatusBar>
@@ -12,15 +17,49 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_settingsManager(new SettingsManager)
+    , m_translationManager(new TranslationManager(qobject_cast<QApplication *>(QApplication::instance()), this))
 {
     ui->setupUi(this);
     setupActions();
+    restoreSettings();
     updateActions();
 }
 
 MainWindow::~MainWindow()
 {
+    saveSettings();
+    delete m_settingsManager;
     delete ui;
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    if (event != nullptr && event->type() == QEvent::LanguageChange) {
+        ui->retranslateUi(this);
+        updateActions();
+        for (int index = 0; index < ui->documentsTabWidget->count(); ++index) {
+            if (auto *document = qobject_cast<DocumentWidget *>(ui->documentsTabWidget->widget(index))) {
+                ui->documentsTabWidget->setTabText(index, document->displayName());
+            }
+        }
+    }
+
+    QMainWindow::changeEvent(event);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    for (int index = ui->documentsTabWidget->count() - 1; index >= 0; --index) {
+        auto *document = qobject_cast<DocumentWidget *>(ui->documentsTabWidget->widget(index));
+        if (!maybeSave(document)) {
+            event->ignore();
+            return;
+        }
+    }
+
+    saveSettings();
+    QMainWindow::closeEvent(event);
 }
 
 void MainWindow::newDocument()
@@ -48,6 +87,7 @@ void MainWindow::openFiles()
             continue;
         }
 
+        m_settingsManager->addRecentFile(filePath);
         addDocumentTab(document);
     }
 }
@@ -70,6 +110,7 @@ void MainWindow::saveCurrentDocument()
         return;
     }
 
+    m_settingsManager->addRecentFile(document->filePath());
     statusBar()->showMessage(tr("File saved"), 3000);
 }
 
@@ -103,6 +144,7 @@ void MainWindow::closeDocumentAt(int index)
         return;
     }
 
+    document->saveColumnWidths();
     ui->documentsTabWidget->removeTab(index);
     document->deleteLater();
     updateActions();
@@ -192,6 +234,21 @@ void MainWindow::updateCurrentTabTitle()
     }
 }
 
+void MainWindow::switchToEnglish()
+{
+    switchLanguage(QStringLiteral("en"));
+}
+
+void MainWindow::switchToRussian()
+{
+    switchLanguage(QStringLiteral("ru"));
+}
+
+void MainWindow::switchToGerman()
+{
+    switchLanguage(QStringLiteral("de"));
+}
+
 void MainWindow::setupActions()
 {
     connect(ui->actionNew, &QAction::triggered, this, &MainWindow::newDocument);
@@ -214,15 +271,31 @@ void MainWindow::setupActions()
     connect(ui->documentsTabWidget, &QTabWidget::currentChanged, this, &MainWindow::updateActions);
     connect(ui->documentsTabWidget, &QTabWidget::tabCloseRequested, this, &MainWindow::closeDocumentAt);
 
-    connect(ui->actionEnglish, &QAction::triggered, this, [this]() {
-        statusBar()->showMessage(tr("English language will be loaded by TranslationManager."), 3000);
-    });
-    connect(ui->actionRussian, &QAction::triggered, this, [this]() {
-        statusBar()->showMessage(tr("Russian language will be loaded by TranslationManager."), 3000);
-    });
-    connect(ui->actionGerman, &QAction::triggered, this, [this]() {
-        statusBar()->showMessage(tr("German language will be loaded by TranslationManager."), 3000);
-    });
+    connect(ui->actionEnglish, &QAction::triggered, this, &MainWindow::switchToEnglish);
+    connect(ui->actionRussian, &QAction::triggered, this, &MainWindow::switchToRussian);
+    connect(ui->actionGerman, &QAction::triggered, this, &MainWindow::switchToGerman);
+}
+
+void MainWindow::restoreSettings()
+{
+    m_settingsManager->restoreMainWindow(this);
+    switchLanguage(m_settingsManager->language());
+}
+
+void MainWindow::saveSettings() const
+{
+    m_settingsManager->saveMainWindow(this);
+    if (DocumentWidget *document = currentDocument()) {
+        document->saveColumnWidths();
+    }
+}
+
+void MainWindow::switchLanguage(const QString &language)
+{
+    if (m_translationManager->switchLanguage(language)) {
+        m_settingsManager->setLanguage(language);
+        statusBar()->showMessage(tr("Language changed"), 3000);
+    }
 }
 
 DocumentWidget *MainWindow::currentDocument() const
@@ -271,6 +344,7 @@ bool MainWindow::maybeSave(DocumentWidget *document)
         return false;
     }
 
+    m_settingsManager->addRecentFile(document->filePath());
     return true;
 }
 
@@ -297,6 +371,7 @@ bool MainWindow::saveDocumentAs(DocumentWidget *document)
         return false;
     }
 
+    m_settingsManager->addRecentFile(filePath);
     statusBar()->showMessage(tr("File saved"), 3000);
     return true;
 }
