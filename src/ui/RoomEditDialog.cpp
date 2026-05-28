@@ -24,13 +24,15 @@ void RoomEditDialog::setRoom(const Room &room)
     ui->idLineEdit->setText(room.id);
     ui->buildingLineEdit->setText(room.building);
     ui->floorLineEdit->setText(QString::number(room.floor));
-    ui->numberLineEdit->setText(room.number);
-    ui->typeLineEdit->setText(room.type);
+    ui->numberLineEdit->setText(room.roomNumber);
+    ui->typeLineEdit->setText(room.roomType);
     ui->areaLineEdit->setText(QString::number(room.area, 'f', 2));
+    ui->capacityLineEdit->setText(QString::number(room.capacity));
     ui->departmentLineEdit->setText(room.department);
-    ui->capacityLineEdit->setText(QString::number(room.workplaces));
-    ui->statusLineEdit->setText(room.status);
-    ui->responsibleLineEdit->setText(room.responsible);
+    ui->responsibleLineEdit->setText(room.responsiblePerson);
+    ui->conditionLineEdit->setText(room.condition);
+    ui->lastRenovationDateEdit->setDate(room.lastRenovationDate.isValid() ? room.lastRenovationDate : QDate::currentDate());
+    ui->notesPlainTextEdit->setPlainText(room.notes);
 }
 
 Room RoomEditDialog::room() const
@@ -39,13 +41,15 @@ Room RoomEditDialog::room() const
     room.id = ui->idLineEdit->text().trimmed();
     room.building = ui->buildingLineEdit->text().trimmed();
     room.floor = ui->floorLineEdit->text().toInt();
-    room.number = ui->numberLineEdit->text().trimmed();
-    room.type = ui->typeLineEdit->text().trimmed();
+    room.roomNumber = ui->numberLineEdit->text().trimmed();
+    room.roomType = ui->typeLineEdit->text().trimmed();
     room.area = ui->areaLineEdit->text().toDouble();
+    room.capacity = ui->capacityLineEdit->text().toInt();
     room.department = ui->departmentLineEdit->text().trimmed();
-    room.workplaces = ui->capacityLineEdit->text().toInt();
-    room.status = ui->statusLineEdit->text().trimmed();
-    room.responsible = ui->responsibleLineEdit->text().trimmed();
+    room.responsiblePerson = ui->responsibleLineEdit->text().trimmed();
+    room.condition = ui->conditionLineEdit->text().trimmed();
+    room.lastRenovationDate = ui->lastRenovationDateEdit->date();
+    room.notes = ui->notesPlainTextEdit->toPlainText().trimmed();
     return room;
 }
 
@@ -86,12 +90,14 @@ bool RoomEditDialog::validateInput() const
         || ui->numberLineEdit->text().trimmed().isEmpty()
         || ui->typeLineEdit->text().trimmed().isEmpty()
         || ui->areaLineEdit->text().trimmed().isEmpty()
+        || ui->capacityLineEdit->text().trimmed().isEmpty()
         || ui->departmentLineEdit->text().trimmed().isEmpty()
-        || ui->capacityLineEdit->text().trimmed().isEmpty()) {
+        || ui->responsibleLineEdit->text().trimmed().isEmpty()
+        || ui->conditionLineEdit->text().trimmed().isEmpty()) {
         QMessageBox::warning(
             const_cast<RoomEditDialog *>(this),
             tr("Invalid data"),
-            tr("Fill all required fields: ID, building, floor, room number, type, area, department and capacity.")
+            tr("Fill all required fields: ID, building, floor, room number, room type, area, capacity, department, responsible person and condition.")
         );
         return false;
     }
