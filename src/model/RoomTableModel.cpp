@@ -243,6 +243,11 @@ QVariant RoomTableModel::headerData(int section, Qt::Orientation orientation, in
     }
 }
 
+void RoomTableModel::refreshHeaderTranslations()
+{
+    emit headerDataChanged(Qt::Horizontal, 0, ColumnCount - 1);
+}
+
 Qt::ItemFlags RoomTableModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid()) {
