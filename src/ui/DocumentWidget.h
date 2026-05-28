@@ -18,70 +18,45 @@ class DocumentWidget;
  *
  * The widget owns its own RoomTableModel and RoomSortFilterProxyModel,
  * displays data in QTableView, supports table editing actions, context menu,
- * sorting and filtering by a selected column.
+ * sorting, filtering and drag-and-drop.
  */
 class DocumentWidget final : public QWidget
 {
     Q_OBJECT
 
 public:
-    /**
-     * @brief Creates a document widget.
-     * @param parent Parent widget.
-     */
+    /** @brief Creates a document widget. */
     explicit DocumentWidget(QWidget *parent = nullptr);
 
-    /**
-     * @brief Destroys the document widget.
-     */
+    /** @brief Destroys the document widget and saves table column widths. */
     ~DocumentWidget() override;
 
-    /**
-     * @brief Returns the current file path.
-     * @return File path or an empty string for a new document.
-     */
+    /** @brief Returns the current file path. */
     QString filePath() const;
 
-    /**
-     * @brief Returns a title suitable for a tab caption.
-     * @return Display name with modified marker.
-     */
+    /** @brief Returns a title suitable for a tab caption. */
     QString displayName() const;
 
-    /**
-     * @brief Checks whether the document has unsaved changes.
-     * @return True if document data was changed.
-     */
+    /** @brief Checks whether the document has unsaved changes. */
     bool isModified() const;
 
-    /**
-     * @brief Returns the table view used by this document.
-     * @return Table view pointer.
-     */
+    /** @brief Returns the table view used by this document. */
     QTableView *tableView() const;
 
-    /**
-     * @brief Loads room data from a text file.
-     * @param filePath Path to the room database file.
-     * @param errorMessage Optional error message output.
-     * @return True if the file was loaded.
-     */
+    /** @brief Loads room data from a text file. */
     bool loadFromFile(const QString &filePath, QString *errorMessage = nullptr);
 
-    /**
-     * @brief Saves room data to the current file path.
-     * @param errorMessage Optional error message output.
-     * @return True if the document was saved.
-     */
+    /** @brief Saves room data to the current file path. */
     bool save(QString *errorMessage = nullptr);
 
-    /**
-     * @brief Saves room data to a selected file path.
-     * @param filePath Target file path.
-     * @param errorMessage Optional error message output.
-     * @return True if the document was saved.
-     */
+    /** @brief Saves room data to a selected file path. */
     bool saveAs(const QString &filePath, QString *errorMessage = nullptr);
+
+    /** @brief Saves table column widths to QSettings. */
+    void saveColumnWidths() const;
+
+    /** @brief Restores table column widths from QSettings. */
+    void restoreColumnWidths();
 
 public slots:
     /** @brief Adds a new room record. */
@@ -93,7 +68,7 @@ public slots:
     /** @brief Deletes selected room records. */
     void deleteSelectedRooms();
 
-    /** @brief Opens print dialog for the document table. */
+    /** @brief Opens print preview for the document table. */
     void printDocument();
 
     /** @brief Shows chart dialog for this document. */
