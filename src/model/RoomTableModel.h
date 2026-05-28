@@ -1,9 +1,12 @@
 #pragma once
 
 #include <QAbstractTableModel>
+#include <QStringList>
 #include <QVector>
 
 #include "core/room.h"
+
+class QMimeData;
 
 /**
  * @brief Table model for office room records.
