@@ -5,6 +5,7 @@
 #include <QString>
 #include <QWidget>
 
+class QEvent;
 class RoomTableModel;
 class RoomSortFilterProxyModel;
 class QTableView;
@@ -131,6 +132,13 @@ signals:
     /** @brief Emitted when tab title must be updated. */
     void titleChanged();
 
+protected:
+    /**
+     * @brief Handles language change events.
+     * @param event Qt event.
+     */
+    void changeEvent(QEvent *event) override;
+
 private slots:
     /**
      * @brief Updates proxy search column from the combo box.
@@ -165,6 +173,9 @@ private:
 
     /** @brief Fills the search column combo box. */
     void setupSearchColumns();
+
+    /** @brief Retranslates UI and search column captions after language changes. */
+    void retranslateDocumentUi();
 
     /**
      * @brief Updates file path and emits related signals.
