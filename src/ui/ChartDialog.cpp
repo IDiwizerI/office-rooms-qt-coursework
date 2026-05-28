@@ -65,7 +65,7 @@ void ChartDialog::buildTypeChart()
 {
     QMap<QString, int> countByType;
     for (const Room &room : m_rooms) {
-        countByType[normalizedCategory(room.type, tr("Unknown"))] += 1;
+        countByType[normalizedCategory(room.roomType, tr("Unknown"))] += 1;
     }
 
     auto *set = new QBarSet(tr("Rooms"));
