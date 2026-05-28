@@ -74,7 +74,7 @@ void MainWindow::openFiles()
         this,
         tr("Open room database"),
         QString(),
-        tr("Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
+        tr("Office rooms database (*.ordb);;Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
     );
 
     for (const QString &filePath : filePaths) {
@@ -358,7 +358,7 @@ bool MainWindow::saveDocumentAs(DocumentWidget *document)
         this,
         tr("Save room database"),
         document->filePath(),
-        tr("Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
+        tr("Office rooms database (*.ordb);;Room database (*.rooms);;Text files (*.txt);;All files (*.*)")
     );
 
     if (filePath.isEmpty()) {
