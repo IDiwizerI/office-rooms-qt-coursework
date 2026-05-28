@@ -1,5 +1,6 @@
 #include "RoomTableModel.h"
 
+#include <QDate>
 #include <QMimeData>
 #include <QLocale>
 #include <QRegularExpression>
@@ -9,6 +10,7 @@
 
 namespace {
 const QString CsvMimeType = QStringLiteral("text/csv");
+const QString DateFormat = QStringLiteral("yyyy-MM-dd");
 
 QString escapeCsvField(QString value)
 {
@@ -42,6 +44,12 @@ QStringList splitCsvLine(const QString &line)
 
     fields.append(current);
     return fields;
+}
+
+QDate dateFromString(const QString &value)
+{
+    const QDate date = QDate::fromString(value.trimmed(), DateFormat);
+    return date.isValid() ? date : QDate::currentDate();
 }
 }
 
@@ -80,7 +88,7 @@ QVariant RoomTableModel::data(const QModelIndex &index, int role) const
         switch (index.column()) {
         case FloorColumn:
         case AreaColumn:
-        case WorkplacesColumn:
+        case CapacityColumn:
             return QVariant::fromValue(Qt::Alignment(Qt::AlignRight | Qt::AlignVCenter));
         default:
             return QVariant::fromValue(Qt::Alignment(Qt::AlignLeft | Qt::AlignVCenter));
@@ -98,23 +106,27 @@ QVariant RoomTableModel::data(const QModelIndex &index, int role) const
         return room.building;
     case FloorColumn:
         return room.floor;
-    case NumberColumn:
-        return room.number;
-    case TypeColumn:
-        return room.type;
+    case RoomNumberColumn:
+        return room.roomNumber;
+    case RoomTypeColumn:
+        return room.roomType;
     case AreaColumn:
         if (role == Qt::DisplayRole) {
             return QLocale().toString(room.area, 'f', 2);
         }
         return room.area;
+    case CapacityColumn:
+        return room.capacity;
     case DepartmentColumn:
         return room.department;
-    case WorkplacesColumn:
-        return room.workplaces;
-    case StatusColumn:
-        return room.status;
-    case ResponsibleColumn:
-        return room.responsible;
+    case ResponsiblePersonColumn:
+        return room.responsiblePerson;
+    case ConditionColumn:
+        return room.condition;
+    case LastRenovationDateColumn:
+        return room.lastRenovationDate.toString(DateFormat);
+    case NotesColumn:
+        return room.notes;
     default:
         return {};
     }
@@ -144,11 +156,11 @@ bool RoomTableModel::setData(const QModelIndex &index, const QVariant &value, in
         room.floor = floor;
         break;
     }
-    case NumberColumn:
-        room.number = value.toString().trimmed();
+    case RoomNumberColumn:
+        room.roomNumber = value.toString().trimmed();
         break;
-    case TypeColumn:
-        room.type = value.toString().trimmed();
+    case RoomTypeColumn:
+        room.roomType = value.toString().trimmed();
         break;
     case AreaColumn: {
         bool ok = false;
@@ -159,23 +171,29 @@ bool RoomTableModel::setData(const QModelIndex &index, const QVariant &value, in
         room.area = area;
         break;
     }
+    case CapacityColumn: {
+        bool ok = false;
+        const int capacity = value.toInt(&ok);
+        if (!ok || capacity < 0) {
+            return false;
+        }
+        room.capacity = capacity;
+        break;
+    }
     case DepartmentColumn:
         room.department = value.toString().trimmed();
         break;
-    case WorkplacesColumn: {
-        bool ok = false;
-        const int workplaces = value.toInt(&ok);
-        if (!ok || workplaces < 0) {
-            return false;
-        }
-        room.workplaces = workplaces;
+    case ResponsiblePersonColumn:
+        room.responsiblePerson = value.toString().trimmed();
         break;
-    }
-    case StatusColumn:
-        room.status = value.toString().trimmed();
+    case ConditionColumn:
+        room.condition = value.toString().trimmed();
         break;
-    case ResponsibleColumn:
-        room.responsible = value.toString().trimmed();
+    case LastRenovationDateColumn:
+        room.lastRenovationDate = dateFromString(value.toString());
+        break;
+    case NotesColumn:
+        room.notes = value.toString().trimmed();
         break;
     default:
         return false;
@@ -202,20 +220,24 @@ QVariant RoomTableModel::headerData(int section, Qt::Orientation orientation, in
         return tr("Building");
     case FloorColumn:
         return tr("Floor");
-    case NumberColumn:
+    case RoomNumberColumn:
         return tr("Room number");
-    case TypeColumn:
-        return tr("Type");
+    case RoomTypeColumn:
+        return tr("Room type");
     case AreaColumn:
         return tr("Area");
+    case CapacityColumn:
+        return tr("Capacity");
     case DepartmentColumn:
         return tr("Department");
-    case WorkplacesColumn:
-        return tr("Workplaces");
-    case StatusColumn:
-        return tr("Status");
-    case ResponsibleColumn:
-        return tr("Responsible");
+    case ResponsiblePersonColumn:
+        return tr("Responsible person");
+    case ConditionColumn:
+        return tr("Condition");
+    case LastRenovationDateColumn:
+        return tr("Last renovation date");
+    case NotesColumn:
+        return tr("Notes");
     default:
         return {};
     }
@@ -378,13 +400,15 @@ QString RoomTableModel::roomToCsvLine(const Room &room) const
         escapeCsvField(room.id),
         escapeCsvField(room.building),
         QString::number(room.floor),
-        escapeCsvField(room.number),
-        escapeCsvField(room.type),
+        escapeCsvField(room.roomNumber),
+        escapeCsvField(room.roomType),
         QString::number(room.area, 'f', 2),
+        QString::number(room.capacity),
         escapeCsvField(room.department),
-        QString::number(room.workplaces),
-        escapeCsvField(room.status),
-        escapeCsvField(room.responsible)
+        escapeCsvField(room.responsiblePerson),
+        escapeCsvField(room.condition),
+        room.lastRenovationDate.toString(DateFormat),
+        escapeCsvField(room.notes)
     }.join(';');
 }
 
@@ -403,13 +427,15 @@ QVector<Room> RoomTableModel::roomsFromCsv(const QString &text) const
         room.id = fields.at(IdColumn).trimmed();
         room.building = fields.at(BuildingColumn).trimmed();
         room.floor = fields.at(FloorColumn).toInt();
-        room.number = fields.at(NumberColumn).trimmed();
-        room.type = fields.at(TypeColumn).trimmed();
+        room.roomNumber = fields.at(RoomNumberColumn).trimmed();
+        room.roomType = fields.at(RoomTypeColumn).trimmed();
         room.area = fields.at(AreaColumn).toDouble();
+        room.capacity = fields.at(CapacityColumn).toInt();
         room.department = fields.at(DepartmentColumn).trimmed();
-        room.workplaces = fields.at(WorkplacesColumn).toInt();
-        room.status = fields.at(StatusColumn).trimmed();
-        room.responsible = fields.at(ResponsibleColumn).trimmed();
+        room.responsiblePerson = fields.at(ResponsiblePersonColumn).trimmed();
+        room.condition = fields.at(ConditionColumn).trimmed();
+        room.lastRenovationDate = dateFromString(fields.at(LastRenovationDateColumn));
+        room.notes = fields.at(NotesColumn).trimmed();
         result.append(room);
     }
 
