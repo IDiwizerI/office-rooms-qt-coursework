@@ -1,0 +1,25 @@
+/**
+ * @mainpage Office Rooms Coursework Documentation
+ *
+ * @section intro_sec Overview
+ * Office Rooms is a Qt 6 coursework application for accounting office premises
+ * of a construction company.
+ *
+ * @section architecture_sec Architecture
+ * The application follows the Qt Model/View approach:
+ * QVector<Room> -> RoomTableModel -> RoomSortFilterProxyModel -> QTableView.
+ *
+ * @section modules_sec Main Modules
+ * - Data entity: Room.
+ * - Table model: RoomTableModel.
+ * - Sorting and filtering: RoomSortFilterProxyModel.
+ * - Multi-document UI: MainWindow and DocumentWidget.
+ * - Dialogs: RoomEditDialog, AboutDialog and ChartDialog.
+ * - Services: SettingsManager, TranslationManager and PrintService.
+ *
+ * @section build_sec Documentation Generation
+ * Run Doxygen from the repository root:
+ * @code
+ * doxygen docs/Doxyfile
+ * @endcode
+ */
