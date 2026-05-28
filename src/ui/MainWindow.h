@@ -3,6 +3,8 @@
 #include <QMainWindow>
 
 class DocumentWidget;
+class SettingsManager;
+class TranslationManager;
 
 namespace Ui {
 class MainWindow;
@@ -13,6 +15,7 @@ class MainWindow;
  *
  * Provides menu actions for multi-document work through QTabWidget.
  * Each tab contains its own DocumentWidget and its own RoomTableModel.
+ * The window saves geometry, restores settings and switches interface language.
  */
 class MainWindow final : public QMainWindow
 {
@@ -30,119 +33,103 @@ public:
      */
     ~MainWindow() override;
 
-private slots:
+protected:
     /**
-     * @brief Creates an empty document tab.
+     * @brief Handles language change events and updates translated UI text.
+     * @param event Change event.
      */
+    void changeEvent(QEvent *event) override;
+
+    /**
+     * @brief Saves settings before closing.
+     * @param event Close event.
+     */
+    void closeEvent(QCloseEvent *event) override;
+
+private slots:
+    /** @brief Creates an empty document tab. */
     void newDocument();
 
-    /**
-     * @brief Opens one or more room database files.
-     */
+    /** @brief Opens one or more room database files. */
     void openFiles();
 
-    /**
-     * @brief Saves the current document.
-     */
+    /** @brief Saves the current document. */
     void saveCurrentDocument();
 
-    /**
-     * @brief Saves the current document using a new file path.
-     */
+    /** @brief Saves the current document using a new file path. */
     void saveCurrentDocumentAs();
 
-    /**
-     * @brief Closes the current document tab.
-     */
+    /** @brief Closes the current document tab. */
     void closeCurrentDocument();
 
-    /**
-     * @brief Closes the selected document tab.
-     * @param index Tab index.
-     */
+    /** @brief Closes the selected document tab. */
     void closeDocumentAt(int index);
 
-    /**
-     * @brief Adds a room to the current document.
-     */
+    /** @brief Adds a room to the current document. */
     void addRoom();
 
-    /**
-     * @brief Edits selected room in the current document.
-     */
+    /** @brief Edits selected room in the current document. */
     void editRoom();
 
-    /**
-     * @brief Deletes selected rooms in the current document.
-     */
+    /** @brief Deletes selected rooms in the current document. */
     void deleteRooms();
 
-    /**
-     * @brief Prints the current document.
-     */
+    /** @brief Prints the current document. */
     void printCurrentDocument();
 
-    /**
-     * @brief Shows chart for the current document.
-     */
+    /** @brief Shows chart for the current document. */
     void showCurrentChart();
 
-    /**
-     * @brief Focuses search field in the current document.
-     */
+    /** @brief Focuses search field in the current document. */
     void focusSearch();
 
-    /**
-     * @brief Clears search field in the current document.
-     */
+    /** @brief Clears search field in the current document. */
     void clearSearch();
 
-    /**
-     * @brief Shows the about dialog.
-     */
+    /** @brief Shows the about dialog. */
     void showAboutDialog();
 
-    /**
-     * @brief Updates enabled state of actions.
-     */
+    /** @brief Updates enabled state of actions. */
     void updateActions();
 
-    /**
-     * @brief Updates title of a changed tab.
-     */
+    /** @brief Updates title of a changed tab. */
     void updateCurrentTabTitle();
 
+    /** @brief Switches interface language to English. */
+    void switchToEnglish();
+
+    /** @brief Switches interface language to Russian. */
+    void switchToRussian();
+
+    /** @brief Switches interface language to German. */
+    void switchToGerman();
+
 private:
-    /**
-     * @brief Connects menu actions to slots.
-     */
+    /** @brief Connects menu actions to slots. */
     void setupActions();
 
-    /**
-     * @brief Returns the active document widget.
-     * @return Active document or nullptr if there is no tab.
-     */
+    /** @brief Restores persistent settings. */
+    void restoreSettings();
+
+    /** @brief Saves persistent settings. */
+    void saveSettings() const;
+
+    /** @brief Switches language and stores it in settings. */
+    void switchLanguage(const QString &language);
+
+    /** @brief Returns the active document widget. */
     DocumentWidget *currentDocument() const;
 
-    /**
-     * @brief Adds a document widget as a new tab.
-     * @param document Document widget to add.
-     */
+    /** @brief Adds a document widget as a new tab. */
     void addDocumentTab(DocumentWidget *document);
 
-    /**
-     * @brief Saves a document if it has unsaved changes.
-     * @param document Document to check.
-     * @return True if closing can continue.
-     */
+    /** @brief Saves a document if it has unsaved changes. */
     bool maybeSave(DocumentWidget *document);
 
-    /**
-     * @brief Shows a save file dialog and saves the document.
-     * @param document Document to save.
-     * @return True if saved.
-     */
+    /** @brief Shows a save file dialog and saves the document. */
     bool saveDocumentAs(DocumentWidget *document);
 
     Ui::MainWindow *ui;
+    SettingsManager *m_settingsManager;
+    TranslationManager *m_translationManager;
 };
