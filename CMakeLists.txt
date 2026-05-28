@@ -22,6 +22,13 @@ qt_add_executable(office_rooms_qt_coursework
     src/model/RoomSortFilterProxyModel.h
     src/model/RoomSortFilterProxyModel.cpp
 
+    src/services/SettingsManager.h
+    src/services/SettingsManager.cpp
+    src/services/TranslationManager.h
+    src/services/TranslationManager.cpp
+    src/services/PrintService.h
+    src/services/PrintService.cpp
+
     src/ui/MainWindow.h
     src/ui/MainWindow.cpp
     src/ui/MainWindow.ui
@@ -56,6 +63,7 @@ target_include_directories(office_rooms_qt_coursework
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/include
         ${CMAKE_CURRENT_SOURCE_DIR}/src/model
+        ${CMAKE_CURRENT_SOURCE_DIR}/src/services
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ui
 )
 
