@@ -2,9 +2,11 @@
 #include "ui_DocumentWidget.h"
 
 #include "ChartDialog.h"
+#include "PrintService.h"
 #include "RoomEditDialog.h"
 #include "RoomSortFilterProxyModel.h"
 #include "RoomTableModel.h"
+#include "SettingsManager.h"
 #include "core/room.h"
 
 #include <QAbstractItemModel>
@@ -15,9 +17,6 @@
 #include <QItemSelectionModel>
 #include <QMenu>
 #include <QMessageBox>
-#include <QPainter>
-#include <QPrintDialog>
-#include <QPrinter>
 #include <QPushButton>
 #include <QTableView>
 #include <QTextStream>
@@ -28,6 +27,7 @@
 namespace {
 constexpr int AllColumnsValue = -1;
 constexpr int RequiredColumnCount = 10;
+constexpr auto ColumnSettingsKey = "roomsTable";
 
 QString escapeField(QString value)
 {
@@ -104,6 +104,7 @@ DocumentWidget::DocumentWidget(QWidget *parent)
     ui->setupUi(this);
     setupTable();
     setupSearchColumns();
+    restoreColumnWidths();
 
     connect(ui->searchColumnComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &DocumentWidget::updateSearchColumn);
     connect(ui->searchLineEdit, &QLineEdit::textChanged, this, &DocumentWidget::updateSearchText);
@@ -117,6 +118,7 @@ DocumentWidget::DocumentWidget(QWidget *parent)
 
 DocumentWidget::~DocumentWidget()
 {
+    saveColumnWidths();
     delete ui;
 }
 
@@ -231,9 +233,20 @@ bool DocumentWidget::saveAs(const QString &filePath, QString *errorMessage)
         output << roomToLine(room) << '\n';
     }
 
+    SettingsManager().addRecentFile(filePath);
     setFilePath(filePath);
     setModified(false);
     return true;
+}
+
+void DocumentWidget::saveColumnWidths() const
+{
+    SettingsManager().saveColumnWidths(ui->roomsTableView, QStringLiteral(ColumnSettingsKey));
+}
+
+void DocumentWidget::restoreColumnWidths()
+{
+    SettingsManager().restoreColumnWidths(ui->roomsTableView, QStringLiteral(ColumnSettingsKey));
 }
 
 void DocumentWidget::addRoom()
@@ -292,16 +305,8 @@ void DocumentWidget::deleteSelectedRooms()
 
 void DocumentWidget::printDocument()
 {
-    QPrinter printer(QPrinter::HighResolution);
-    QPrintDialog dialog(&printer, this);
-    dialog.setWindowTitle(tr("Print"));
-
-    if (dialog.exec() != QDialog::Accepted) {
-        return;
-    }
-
-    QPainter painter(&printer);
-    ui->roomsTableView->render(&painter);
+    PrintService printService(this);
+    printService.printModel(m_proxyModel, this, displayName());
 }
 
 void DocumentWidget::showChart()
@@ -365,6 +370,11 @@ void DocumentWidget::setupTable()
     m_proxyModel->setSourceModel(m_model);
     ui->roomsTableView->setModel(m_proxyModel);
     ui->roomsTableView->setSortingEnabled(true);
+    ui->roomsTableView->setDragEnabled(true);
+    ui->roomsTableView->setAcceptDrops(true);
+    ui->roomsTableView->setDropIndicatorShown(true);
+    ui->roomsTableView->setDragDropMode(QAbstractItemView::DragDrop);
+    ui->roomsTableView->setDefaultDropAction(Qt::CopyAction);
     ui->roomsTableView->horizontalHeader()->setStretchLastSection(true);
     ui->roomsTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     ui->roomsTableView->verticalHeader()->setVisible(false);
