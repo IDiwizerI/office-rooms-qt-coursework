@@ -9,11 +9,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport Charts)
+find_package(Qt6 REQUIRED COMPONENTS Widgets PrintSupport Charts LinguistTools)
 
 qt_standard_project_setup()
 
-qt_add_executable(office_rooms_qt_coursework
+set(PROJECT_SOURCES
     src/main.cpp
     resources/resources.qrc
 
@@ -57,6 +57,23 @@ qt_add_executable(office_rooms_qt_coursework
     include/services/settingsmanager.h
     include/services/translationmanager.h
     include/widgets/roomdocumentwidget.h
+)
+
+set(TRANSLATION_FILES
+    translations/office_rooms_en.ts
+    translations/office_rooms_ru.ts
+    translations/office_rooms_de.ts
+)
+
+qt_add_executable(office_rooms_qt_coursework
+    ${PROJECT_SOURCES}
+)
+
+qt_add_translations(office_rooms_qt_coursework
+    TS_FILES ${TRANSLATION_FILES}
+    SOURCES ${PROJECT_SOURCES}
+    RESOURCE_PREFIX "/translations"
+    LUPDATE_OPTIONS -no-obsolete
 )
 
 target_include_directories(office_rooms_qt_coursework
