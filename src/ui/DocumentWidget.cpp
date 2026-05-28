@@ -27,7 +27,7 @@
 namespace {
 constexpr int AllColumnsValue = -1;
 constexpr int RequiredColumnCount = 10;
-constexpr auto ColumnSettingsKey = "roomsTable";
+const QString ColumnSettingsKey = QStringLiteral("roomsTable");
 
 QString escapeField(QString value)
 {
@@ -241,12 +241,12 @@ bool DocumentWidget::saveAs(const QString &filePath, QString *errorMessage)
 
 void DocumentWidget::saveColumnWidths() const
 {
-    SettingsManager().saveColumnWidths(ui->roomsTableView, QStringLiteral(ColumnSettingsKey));
+    SettingsManager().saveColumnWidths(ui->roomsTableView, ColumnSettingsKey);
 }
 
 void DocumentWidget::restoreColumnWidths()
 {
-    SettingsManager().restoreColumnWidths(ui->roomsTableView, QStringLiteral(ColumnSettingsKey));
+    SettingsManager().restoreColumnWidths(ui->roomsTableView, ColumnSettingsKey);
 }
 
 void DocumentWidget::addRoom()
