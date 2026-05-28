@@ -12,13 +12,16 @@
 #include <QAbstractItemModel>
 #include <QComboBox>
 #include <QDate>
+#include <QEvent>
 #include <QFile>
 #include <QFileInfo>
 #include <QHeaderView>
 #include <QItemSelectionModel>
+#include <QLineEdit>
 #include <QMenu>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QSignalBlocker>
 #include <QTableView>
 #include <QTextStream>
 
@@ -282,6 +285,15 @@ void DocumentWidget::clearSearch()
     m_proxyModel->clearFilter();
 }
 
+void DocumentWidget::changeEvent(QEvent *event)
+{
+    if (event != nullptr && event->type() == QEvent::LanguageChange) {
+        retranslateDocumentUi();
+    }
+
+    QWidget::changeEvent(event);
+}
+
 void DocumentWidget::updateSearchColumn(int index) { m_proxyModel->setSearchColumn(ui->searchColumnComboBox->itemData(index).toInt()); }
 void DocumentWidget::updateSearchText(const QString &text) { m_proxyModel->setSearchText(text); }
 
@@ -327,10 +339,26 @@ void DocumentWidget::setupTable()
 
 void DocumentWidget::setupSearchColumns()
 {
+    const int selectedColumn = ui->searchColumnComboBox->currentData().isValid()
+                               ? ui->searchColumnComboBox->currentData().toInt()
+                               : AllColumnsValue;
+    const QSignalBlocker blocker(ui->searchColumnComboBox);
+    ui->searchColumnComboBox->clear();
     ui->searchColumnComboBox->addItem(tr("All columns"), AllColumnsValue);
     for (int column = 0; column < RoomTableModel::ColumnCount; ++column) {
         ui->searchColumnComboBox->addItem(m_model->headerData(column, Qt::Horizontal).toString(), column);
     }
+
+    const int restoredIndex = ui->searchColumnComboBox->findData(selectedColumn);
+    ui->searchColumnComboBox->setCurrentIndex(restoredIndex >= 0 ? restoredIndex : 0);
+    m_proxyModel->setSearchColumn(ui->searchColumnComboBox->currentData().toInt());
+}
+
+void DocumentWidget::retranslateDocumentUi()
+{
+    ui->retranslateUi(this);
+    m_model->refreshHeaderTranslations();
+    setupSearchColumns();
 }
 
 void DocumentWidget::setFilePath(const QString &filePath)
