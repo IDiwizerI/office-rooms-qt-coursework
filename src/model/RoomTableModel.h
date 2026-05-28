@@ -22,19 +22,21 @@ class RoomTableModel final : public QAbstractTableModel
 
 public:
     /**
-     * @brief Table column indexes.
+     * @brief Table column indexes matching the ORDB text database format.
      */
     enum Column {
         IdColumn = 0,
         BuildingColumn,
         FloorColumn,
-        NumberColumn,
-        TypeColumn,
+        RoomNumberColumn,
+        RoomTypeColumn,
         AreaColumn,
+        CapacityColumn,
         DepartmentColumn,
-        WorkplacesColumn,
-        StatusColumn,
-        ResponsibleColumn,
+        ResponsiblePersonColumn,
+        ConditionColumn,
+        LastRenovationDateColumn,
+        NotesColumn,
         ColumnCount
     };
 
