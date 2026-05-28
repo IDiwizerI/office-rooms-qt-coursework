@@ -5,9 +5,10 @@
 #include <QRegularExpression>
 #include <QSet>
 #include <QStringList>
+#include <QVariant>
 
 namespace {
-constexpr auto CsvMimeType = "text/csv";
+const QString CsvMimeType = QStringLiteral("text/csv");
 
 QString escapeCsvField(QString value)
 {
@@ -80,9 +81,9 @@ QVariant RoomTableModel::data(const QModelIndex &index, int role) const
         case FloorColumn:
         case AreaColumn:
         case WorkplacesColumn:
-            return Qt::AlignRight | Qt::AlignVCenter;
+            return QVariant::fromValue(Qt::Alignment(Qt::AlignRight | Qt::AlignVCenter));
         default:
-            return Qt::AlignLeft | Qt::AlignVCenter;
+            return QVariant::fromValue(Qt::Alignment(Qt::AlignLeft | Qt::AlignVCenter));
         }
     }
 
@@ -235,7 +236,7 @@ Qt::ItemFlags RoomTableModel::flags(const QModelIndex &index) const
 
 QStringList RoomTableModel::mimeTypes() const
 {
-    return {QStringLiteral(CsvMimeType), QStringLiteral("text/plain")};
+    return QStringList{CsvMimeType, QStringLiteral("text/plain")};
 }
 
 QMimeData *RoomTableModel::mimeData(const QModelIndexList &indexes) const
@@ -259,7 +260,7 @@ QMimeData *RoomTableModel::mimeData(const QModelIndexList &indexes) const
     }
 
     const QString text = lines.join('\n');
-    mimeData->setData(QStringLiteral(CsvMimeType), text.toUtf8());
+    mimeData->setData(CsvMimeType, text.toUtf8());
     mimeData->setText(text);
     return mimeData;
 }
@@ -272,8 +273,8 @@ bool RoomTableModel::dropMimeData(const QMimeData *data, Qt::DropAction action, 
         return true;
     }
 
-    const QString text = data->hasFormat(QStringLiteral(CsvMimeType))
-                         ? QString::fromUtf8(data->data(QStringLiteral(CsvMimeType)))
+    const QString text = data->hasFormat(CsvMimeType)
+                         ? QString::fromUtf8(data->data(CsvMimeType))
                          : data->text();
     const QVector<Room> roomsToInsert = roomsFromCsv(text);
     if (roomsToInsert.isEmpty()) {
