@@ -1,0 +1,26 @@
+OFFICE_ROOMS_DB_V1
+id;building;floor;roomNumber;roomType;area;capacity;department;responsiblePerson;condition;lastRenovationDate;notes
+R001;Headquarters A;1;101;Reception;28.50;4;Administration;Elena Petrova;Good;2024-02-15;Main visitor reception area
+R002;Headquarters A;1;102;Client Meeting Room;36.00;12;Sales;Dmitry Sokolov;Good;2023-11-20;Used for client project presentations
+R003;Headquarters A;1;103;Archive;18.70;2;Administration;Anna Morozova;Satisfactory;2021-08-10;Stores contracts and project documentation
+R004;Headquarters A;2;201;Open Office;64.20;18;Project Management;Sergey Ivanov;Good;2024-01-12;Workplaces for project coordinators
+R005;Headquarters A;2;202;Engineering Office;42.80;10;Engineering;Alexey Smirnov;Good;2023-09-05;Structural engineering team workspace
+R006;Headquarters A;2;203;BIM Room;39.60;8;BIM Department;Natalia Kuznetsova;Excellent;2024-03-01;High-performance workstations installed
+R007;Headquarters A;2;204;Manager Office;21.40;3;Project Management;Pavel Orlov;Good;2022-12-18;Project manager office
+R008;Headquarters A;3;301;Design Studio;58.90;14;Architecture;Irina Volkova;Good;2023-10-14;Architectural design team area
+R009;Headquarters A;3;302;Surveying Office;31.30;6;Surveying;Roman Fedorov;Satisfactory;2022-05-26;Storage cabinets for measuring equipment
+R010;Headquarters A;3;303;Document Control Room;24.00;5;Document Control;Olga Mikhailova;Good;2023-07-08;Project drawings and approvals processing
+R011;Headquarters A;3;304;Server Room;16.50;2;IT;Kirill Novikov;Excellent;2024-04-10;Restricted access and climate control
+R012;Headquarters A;4;401;Conference Hall;72.00;35;Administration;Marina Lebedeva;Good;2023-06-30;Weekly planning meetings and training sessions
+R013;Headquarters A;4;402;Training Room;45.50;20;Human Resources;Yulia Antonova;Good;2024-02-02;Safety and software training
+R014;Headquarters A;4;403;Procurement Office;33.20;7;Procurement;Viktor Pavlov;Satisfactory;2022-09-16;Supplier contract workspace
+R015;Headquarters A;4;404;Finance Office;38.40;9;Finance;Tatyana Belova;Good;2023-04-21;Accounting and payroll workplaces
+R016;Construction Office B;1;B101;Site Coordination Room;41.70;10;Site Management;Andrey Kozlov;Good;2023-12-11;Coordination with construction site supervisors
+R017;Construction Office B;1;B102;Safety Office;22.60;4;Health and Safety;Oleg Vinogradov;Good;2024-01-25;Safety briefings and incident reports
+R018;Construction Office B;1;B103;Materials Control Room;27.90;5;Logistics;Maksim Zaitsev;Satisfactory;2022-11-09;Material delivery tracking
+R019;Construction Office B;2;B201;Estimator Office;35.10;8;Estimating;Svetlana Egorova;Good;2023-08-19;Cost estimating and tender preparation
+R020;Construction Office B;2;B202;Legal Office;24.80;4;Legal;Nikolay Baranov;Good;2023-05-12;Claims and contract review
+R021;Construction Office B;2;B203;Quality Control Office;29.40;6;Quality Control;Denis Karpov;Good;2024-03-18;Inspection reports and quality documentation
+R022;Warehouse Office C;1;C101;Dispatch Room;30.20;6;Logistics;Artem Semyonov;Satisfactory;2022-07-07;Dispatching vehicles and equipment
+R023;Warehouse Office C;1;C102;Equipment Records Room;20.90;3;Equipment Management;Galina Nikitina;Good;2023-01-28;Inventory records and equipment passports
+R024;Warehouse Office C;1;C103;Break Room;26.40;12;Administration;Evgeny Popov;Good;2024-02-27;Staff rest area
