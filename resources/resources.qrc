@@ -1,6 +1,2 @@
 <RCC>
-    <qresource prefix="/translations">
-        <file alias="office_rooms_ru.qm">../translations/office_rooms_ru.qm</file>
-        <file alias="office_rooms_de.qm">../translations/office_rooms_de.qm</file>
-    </qresource>
 </RCC>
